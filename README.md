@@ -21,6 +21,12 @@ REDIS_PASSWORD=YOUR_REDIS_PASSWORD
 CALLBACK_PORT=8888  # for Tornado auth flow server
 
 BOT_TOKEN=YOUR_BOT_TOKEN
+
+APP_CONTAINER=now-playing-app
+APP_IMAGE=now-playing-app:1
+
+DB_CONTAINER=redis
+DB_IMAGE=redis/redis-stack:7.2.0-v3
 ```
 
 ### Start
@@ -37,4 +43,11 @@ acl list
 1) user YOUR_REDIS_USER on #HASHED_PASSWORD ~* &* +@all
 
 config set notify-keyspace-events KEA
+```
+
+### Docker
+
+```sh
+docker build -t spotify-now-playing:1 .
+docker compose up
 ```
