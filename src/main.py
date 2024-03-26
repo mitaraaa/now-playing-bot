@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 import tornado
+from aiogram.types import BotCommand
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp.web import Application, run_app
 
@@ -11,6 +12,13 @@ from src.web.handlers import urls
 
 
 async def start_bot():
+    await bot.set_my_commands(
+        [
+            BotCommand(command="start", description="Authenticate with Spotify"),
+            BotCommand(command="logout", description="Log out of Spotify"),
+        ]
+    )
+
     print("Bot started.")
 
     if Config.MODE == "webhook":

@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  bot:
+    container_name: "${APP_CONTAINER}"
+    image: "${APP_IMAGE}"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT}:3000"
+      - "${CALLBACK_PORT}:8888"
+    env_file:
+      - .env
+    command: python -m src.main
+    depends_on:
+      - db
+  db:
+    container_name: "${DB_CONTAINER}"
+    image: "${DB_IMAGE}"
+    restart: on-failure
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD} --user ${REDIS_USER} on >${REDIS_PASSWORD} on allcommands allkeys ~* &* +@all"
+    env_file:
+      - .env

@@ -10,6 +10,7 @@ r = redis.Redis(
     decode_responses=True,
     charset="utf-8",
 )
+r.config_set("notify-keyspace-events", "KEA")
 
 
 def subscribe_to_expire_event(callback: callable) -> None:

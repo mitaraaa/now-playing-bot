@@ -1,7 +1,6 @@
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, CommandStart
 from aiogram.types import (
-    BotCommand,
     CallbackQuery,
     InlineQuery,
     InlineQueryResultAudio,
@@ -93,11 +92,3 @@ async def add_to_queue(callback_query: CallbackQuery):
         return
 
     await callback_query.answer("Track has been successfully added to queue.")
-
-
-bot.set_my_commands(
-    [
-        BotCommand("start", "Authenticate with Spotify"),
-        BotCommand("logout", "Log out of Spotify"),
-    ]
-)
