@@ -30,7 +30,7 @@ class CallbackHandler(tornado.web.RequestHandler):
 
         credentials = await client.build_user_credentials(grant)
 
-        set_token(state, json.dumps(credentials), credentials["expires_in"])
+        set_token(state, json.dumps(credentials))
 
         await bot.send_message(
             state, "You have been successfully authenticated with Spotify!"

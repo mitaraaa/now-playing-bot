@@ -108,7 +108,7 @@ class SpotifyClient:
 
         new = response.json()
 
-        set_token(user_id, json.dumps(new), expires_in=new["expires_in"])
+        set_token(user_id, json.dumps(new))
 
     def register(self, user_id: str) -> str:
         """

@@ -41,12 +41,6 @@ async def start_web():
 
     print(f"Server started at http://{Config.HOST}:{Config.CALLBACK_PORT}/")
 
-    # Disable Tornado access logs
-    nh = logging.NullHandler()
-    nh.setLevel(logging.DEBUG)
-    logging.getLogger("tornado.access").addHandler(nh)
-    logging.getLogger("tornado.access").propagate = False
-
     await asyncio.Event().wait()
 
 
