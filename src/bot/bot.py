@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher
-from aiogram.filters import Command, CommandStart
+from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import (
     CallbackQuery,
     InlineQuery,
@@ -20,7 +20,20 @@ logger = get_logger("bot")
 
 
 @dp.message(CommandStart())
-async def register(message: Message) -> None:
+async def register(message: Message, command: CommandObject) -> None:
+    args = command.args
+    if args and args == "error":
+        await message.answer("There seems to be an error, maybe try again later?")
+        logger.info(f"[{message.from_user.id}] Clicked on error message")
+        return
+
+    if get_token(message.from_user.id):
+        await message.answer(
+            "Your account is already linked!\n\nSend /logout to unlink it"
+        )
+        logger.info(f"[{message.from_user.id}] User is already authenticated")
+        return
+
     await message.answer(
         "Hello! To start using this bot, you need to authenticate with Spotify. "
         "Please, click the following link: ",
@@ -66,9 +79,10 @@ async def recently_played(inline_query: InlineQuery) -> None:
     except Exception:
         await inline_query.answer(
             [],
-            is_personal=True,
             switch_pm_text="Failed to fetch recently played tracks",
             switch_pm_parameter="retry",
+            is_personal=True,
+            cache_time=2,
         )
         logger.info(f"[{user_id}] Failed to fetch recently played tracks")
         return

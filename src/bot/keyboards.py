@@ -16,3 +16,11 @@ def track_markup(url: str, add_to_queue: str):
     builder.button(text="Add to queue", callback_data=add_to_queue)
 
     return builder.as_markup()
+
+
+def send_inline_message():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Try now", switch_inline_query="")
+
+    return builder.as_markup()

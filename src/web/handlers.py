@@ -3,6 +3,7 @@ import tornado
 from src.api.database import set_token
 from src.api.spotify import client
 from src.bot import bot
+from src.bot.keyboards import send_inline_message
 from src.logger import get_logger
 
 logger = get_logger("web")
@@ -33,14 +34,17 @@ class CallbackHandler(tornado.web.RequestHandler):
             logger.debug(
                 f"[{self.request.remote_ip}] Unable to authenticate: missing arguments"
             )
-            raise tornado.web.MissingArgumentError
+            self.write("Failed to authenticate with Spotify")
+            return
 
         credentials = await client.build_user_credentials(grant)
 
         set_token(state, credentials)
 
         await bot.send_message(
-            state, "You have been successfully authenticated with Spotify!"
+            state,
+            "Your account is linked, try it now!\n\nSend /logout to unlink it.",
+            reply_markup=send_inline_message(),
         )
 
         logger.debug(
