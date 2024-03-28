@@ -41,7 +41,7 @@ async def start_web():
     web = tornado.web.Application(urls)
     web.listen(Config.CALLBACK_PORT)
 
-    logger.info(f"Server started at http://{Config.HOST}:{Config.CALLBACK_PORT}/")
+    logger.info(f"Server started at {Config.HOST}, port {Config.CALLBACK_PORT}")
 
     await asyncio.Event().wait()
 
