@@ -11,9 +11,12 @@ from src.api.database import delete_token, get_token
 from src.api.spotify import client
 from src.bot.keyboards import register_markup, track_markup
 from src.config import Config
+from src.logger import get_logger
 
 dp = Dispatcher()
 bot = Bot(Config.BOT_TOKEN)
+
+logger = get_logger("bot")
 
 
 @dp.message(CommandStart())
@@ -25,6 +28,7 @@ async def register(message: Message) -> None:
             client.register(message.from_user.id),
         ),
     )
+    logger.info(f"[{message.from_user.id}] User has started the bot")
 
 
 @dp.message(Command("logout"))
@@ -33,11 +37,13 @@ async def logout(message: Message) -> None:
 
     if not get_token(user_id):
         await message.answer("You are not authenticated with Spotify.")
+        logger.info(f"[{user_id}] Failed to logout: not authenticated")
         return
 
     delete_token(user_id)
 
     await message.answer("You have been successfully logged out of Spotify.")
+    logger.info(f"[{user_id}] User has logged out of Spotify")
 
 
 @dp.inline_query()
@@ -50,13 +56,18 @@ async def recently_played(inline_query: InlineQuery) -> None:
             switch_pm_text="Authenticate with Spotify",
             switch_pm_parameter="reauth",
             cache_time=10,
+            is_personal=True,
         )
+        logger.info(f"[{user_id}] User is not authenticated with Spotify")
         return
 
     try:
         tracks = await client.get_recently_played(user_id)
     except Exception:
-        await inline_query.answer("Failed to fetch recently played tracks.")
+        await inline_query.answer(
+            "Failed to fetch recently played tracks.", is_personal=True
+        )
+        logger.info(f"[{user_id}] Failed to fetch recently played tracks")
         return
 
     results = [
@@ -72,7 +83,8 @@ async def recently_played(inline_query: InlineQuery) -> None:
         for track in tracks
     ]
 
-    await inline_query.answer(results=results, cache_time=5)
+    await inline_query.answer(results=results, cache_time=5, is_personal=True)
+    logger.info(f"[{user_id}] Fetched recently played tracks")
 
 
 @dp.callback_query()

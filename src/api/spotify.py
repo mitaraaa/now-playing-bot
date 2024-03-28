@@ -1,13 +1,20 @@
 import json
-import re
 from typing import Generator
 from urllib.parse import urlencode
 
 import httpx
 
-from src.api.database import get_token, set_token, subscribe_to_expire_event
+from src.api.database import (
+    delete_token,
+    get_token,
+    set_token,
+    subscribe_to_expire_event,
+)
 from src.api.urls import SpotifyURL
 from src.config import Config
+from src.logger import get_logger
+
+logger = get_logger("api.spotify")
 
 
 class SpotifyClient:
@@ -61,6 +68,8 @@ class SpotifyClient:
 
         response.raise_for_status()
 
+        logger.debug(f"User credentials received, grant: {grant[:8]}...{grant[-8:]}")
+
         return response.json()
 
     def get_credentials(self, user_id: str) -> dict:
@@ -70,6 +79,7 @@ class SpotifyClient:
         credentials = get_token(user_id)
 
         if not credentials:
+            logger.debug(f"[{user_id}]: User credentials not found")
             raise Exception("User credentials not found")
 
         return json.loads(credentials)
@@ -78,16 +88,11 @@ class SpotifyClient:
         """
         Refresh user credentials on expire event.
         """
-        user_id = message["data"]
-        token = get_token(message["data"])
 
-        if not token:
-            return
+        user_id = message["data"].split(":")[1]
+        refresh_token = self.get_credentials(user_id)["refresh_token"]
 
-        refresh_token = token["refresh_token"]
-
-        credentials = re.sub(r"\d+:", "", message["data"], count=1)
-        credentials = json.loads(credentials)
+        delete_token(user_id)
 
         data = {
             "grant_type": self.REFRESH_GRANT_TYPE,
@@ -104,11 +109,14 @@ class SpotifyClient:
         )
 
         if response.status_code != 200:
+            logger.debug(f"[{user_id}]: Failed to refresh token")
             return
 
         new = response.json()
+        new["refresh_token"] = refresh_token
 
-        set_token(user_id, json.dumps(new))
+        set_token(user_id, new)
+        logger.debug(f"[{user_id}]: Token refreshed")
 
     def register(self, user_id: str) -> str:
         """
@@ -133,6 +141,7 @@ class SpotifyClient:
         credentials = self.get_credentials(user_id)
 
         if not credentials:
+            logger.debug(f"[{user_id}]: User credentials not found")
             raise Exception("User credentials not found")
 
         response = await self.requests.post(
@@ -143,7 +152,10 @@ class SpotifyClient:
             params={"uri": uri},
         )
 
+        logger.debug(f"[{user_id}]: Added track to queue ({uri})")
+
         if response.status_code != 204:
+            logger.debug(f"[{user_id}]: Failed to add track to queue ({uri})")
             raise Exception("Failed to add track to queue")
 
     async def get_currently_playing(self, user_id: str) -> dict:
@@ -160,8 +172,10 @@ class SpotifyClient:
         )
 
         if response.status_code != 200:
+            logger.debug(f"[{user_id}]: Failed to get currently playing")
             return None
 
+        logger.debug(f"[{user_id}]: Fetched currently playing")
         return response.json()
 
     async def get_recently_played(self, user_id: str) -> Generator[dict, None, None]:
@@ -179,6 +193,7 @@ class SpotifyClient:
         )
 
         if response.status_code != 200:
+            logger.debug(f"[{user_id}]: Failed to get recently played")
             raise Exception("Failed to get recently played")
 
         items = response.json()["items"]
@@ -188,7 +203,8 @@ class SpotifyClient:
 
         current = await self.get_currently_playing(user_id)
 
-        if current:
+        if current and current["item"]:
+            logger.debug(f"[{user_id}]: Currently playing track found")
             items.insert(0, {"track": current["item"]})
 
         tracks = []
@@ -213,6 +229,7 @@ class SpotifyClient:
                 }
             )
 
+        logger.debug(f"[{user_id}]: Fetched recently played tracks ({len(tracks)}")
         return tracks
 
 

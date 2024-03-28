@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 import tornado
 from aiogram.types import BotCommand
@@ -8,7 +7,10 @@ from aiohttp.web import Application, run_app
 
 from src.bot import bot, dp
 from src.config import Config
+from src.logger import get_logger
 from src.web.handlers import urls
+
+logger = get_logger("main")
 
 
 async def start_bot():
@@ -19,7 +21,7 @@ async def start_bot():
         ]
     )
 
-    print("Bot started.")
+    logger.info("Starting bot")
 
     if Config.MODE == "webhook":
         aioapp = Application()
@@ -39,7 +41,7 @@ async def start_web():
     web = tornado.web.Application(urls)
     web.listen(Config.CALLBACK_PORT)
 
-    print(f"Server started at http://{Config.HOST}:{Config.CALLBACK_PORT}/")
+    logger.info(f"Server started at http://{Config.HOST}:{Config.CALLBACK_PORT}/")
 
     await asyncio.Event().wait()
 

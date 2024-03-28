@@ -12,7 +12,7 @@ services:
       - "${CALLBACK_PORT}:${CALLBACK_PORT}"
     env_file:
       - .env
-    command: python -m src.main
+    command: python -u -m src.main
     depends_on:
       - db
   db:

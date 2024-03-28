@@ -1,6 +1,11 @@
+import json
+
 import redis
 
 from src.config import Config
+from src.logger import get_logger
+
+logger = get_logger("api.database")
 
 r = redis.Redis(
     host=Config.REDIS_HOST,
@@ -22,17 +27,22 @@ def subscribe_to_expire_event(callback: callable) -> None:
     pubsub.psubscribe(**{"__keyevent@0__:expired": callback})
     pubsub.run_in_thread(sleep_time=0.001)
 
-    print("Subscribed to '__keyevent@0__:expired' channel")
+    logger.debug("Subscribed to '__keyevent@0__:expired' channel")
 
 
 def get_token(user_id: str) -> dict:
+    logger.debug(f"Getting token for user {user_id}")
     return r.get(user_id)
 
 
 def set_token(user_id: str, credentials: dict) -> None:
-    r.set(user_id, credentials)
-    r.expire(user_id, Config.TOKEN_TTL)
+    logger.debug(
+        f"Setting token for user {user_id}, expires in {Config.TOKEN_TTL} seconds"
+    )
+    r.set(user_id, json.dumps(credentials))
+    r.set("expired:" + user_id, "", ex=Config.TOKEN_TTL)
 
 
 def delete_token(user_id: str) -> None:
+    logger.debug(f"Deleting token for user {user_id}")
     r.delete(user_id)
