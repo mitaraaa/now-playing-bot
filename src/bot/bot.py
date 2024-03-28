@@ -72,13 +72,16 @@ async def recently_played(inline_query: InlineQuery) -> None:
 
     results = [
         InlineQueryResultAudio(
+            type="audio",
             id=track["uri"],
             title=track["name"],
-            audio_url=track["preview_url"],
-            audio_duration=30,
             performer=track["artists"],
-            type="audio",
+            audio_url=track["preview_url"] if track["preview_url"] else "",
+            audio_duration=30 if track["preview_url"] else 1,
             reply_markup=track_markup(track["url"], track["uri"]),
+            caption="Failed to load track preview :("
+            if not track["preview_url"]
+            else None,
         )
         for track in tracks
     ]

@@ -229,7 +229,7 @@ class SpotifyClient:
                 }
             )
 
-        logger.debug(f"[{user_id}]: Fetched recently played tracks ({len(tracks)}")
+        logger.debug(f"[{user_id}]: Fetched recently played tracks ({len(tracks)})")
         return tracks
 
 
