@@ -4,6 +4,7 @@ from aiogram.types import (
     CallbackQuery,
     InlineQuery,
     InlineQueryResultAudio,
+    InputTextMessageContent,
     Message,
 )
 
@@ -93,10 +94,12 @@ async def recently_played(inline_query: InlineQuery) -> None:
             id=track["uri"],
             title=track["name"],
             performer=track["artists"],
-            audio_url=track["preview_url"] if track["preview_url"] else "",
+            audio_url=track["preview_url"] if track["preview_url"] else track["url"],
             audio_duration=30 if track["preview_url"] else 1,
             reply_markup=track_markup(track["url"], track["uri"]),
-            caption="Failed to load track preview :("
+            input_message_content=InputTextMessageContent(
+                message_text="Failed to load track preview :("
+            )
             if not track["preview_url"]
             else None,
         )
