@@ -94,3 +94,7 @@ This project is still in development, and there are some things to consider:
 -   [redis-py](https://redis-py.readthedocs.io/en/stable/)
 -   [docker-compose](https://docs.docker.com/compose/)
 -   [poetry](https://python-poetry.org/)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
