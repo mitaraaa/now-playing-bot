@@ -3,7 +3,6 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import (
     CallbackQuery,
     InlineQuery,
-    InlineQueryResultArticle,
     InlineQueryResultAudio,
     Message,
 )
@@ -66,13 +65,10 @@ async def recently_played(inline_query: InlineQuery) -> None:
         tracks = await client.get_recently_played(user_id)
     except Exception:
         await inline_query.answer(
-            [
-                InlineQueryResultArticle(
-                    id="error",
-                    title="Failed to fetch recently played tracks.",
-                )
-            ],
+            [],
             is_personal=True,
+            switch_pm_text="Failed to fetch recently played tracks",
+            switch_pm_parameter="retry",
         )
         logger.info(f"[{user_id}] Failed to fetch recently played tracks")
         return
