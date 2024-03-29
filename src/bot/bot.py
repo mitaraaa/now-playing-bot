@@ -30,7 +30,7 @@ async def register(message: Message, command: CommandObject) -> None:
 
     if get_token(message.from_user.id):
         await message.answer(
-            "Your account is already linked!\n\nSend /logout to unlink it"
+            "Your account is already linked!\n\nSend /logout to unlink it."
         )
         logger.info(f"[{message.from_user.id}] User is already authenticated")
         return

@@ -9,6 +9,7 @@ Try it out: [@spotifynpbot](https://t.me/spotifynpbot)
 -   Fetch recently played tracks from Spotify
 -   Add tracks to the queue
 -   Inline mode
+-   Logging
 
 ## Usage
 
@@ -84,6 +85,10 @@ This project is still in development, and there are some things to consider:
 
 -   Possible rate limiting from Spotify
 -   Managing high traffic
+-   Statistics for each user (e.g., how many times a user has shared a track)
+-   Support for Yandex Music/Apple Music/Last.fm/etc.
+-   More features like sharing playlists, searching for tracks
+-   Better logging
 
 ## References
 
