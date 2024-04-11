@@ -1,0 +1,19 @@
+version: 3
+
+tasks:
+  up:
+    cmds:
+      - docker compose up -d
+    desc: Start the container
+  stop:
+    cmds:
+      - docker compose stop
+    desc: Stop the container
+  build:
+    cmds:
+      - docker compose build
+    desc: Rebuild bot image
+  logs:
+    cmds:
+      - docker compose logs -f
+    desc: Show logs from the container
