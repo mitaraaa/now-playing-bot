@@ -1,5 +1,5 @@
 up:
-	docker compose up
+	docker compose up -d
 
 down:
 	docker compose down
@@ -8,4 +8,4 @@ build:
 	docker compose build
 
 logs:
-	docker compose logs -f --tail 10
+	docker compose logs -f
