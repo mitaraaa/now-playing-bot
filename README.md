@@ -6,10 +6,10 @@ Try it out: [@spotifynpbot](https://t.me/spotifynpbot)
 
 ## Features
 
--   Fetch recently played tracks from Spotify
--   Add tracks to the queue
--   Inline mode
--   Logging
+- Fetch recently played tracks from Spotify
+- Add tracks to the queue
+- Inline mode
+- Logging
 
 ## Usage
 
@@ -33,7 +33,6 @@ REDIRECT_URI=http://your-domain.com/callback
 
 SPOTIFY_CLIENT_ID=your-spotify-client-id
 SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
-TOKEN_TTL=3600  # 1 hour at max (Spotify's access token TTL)
 
 REDIS_HOST=redis  # docker-compose service name/localhost
 REDIS_PORT=6379
@@ -83,22 +82,22 @@ Also, I used [buurro/spotify-now-playing-telegram](https://github.com/buurro/spo
 
 This project is still in development, and there are some things to consider:
 
--   Possible rate limiting from Spotify
--   Managing high traffic
--   Statistics for each user (e.g., how many times a user has shared a track)
--   Support for Yandex Music/Apple Music/Last.fm/etc.
--   More features like sharing playlists, searching for tracks
--   Better logging
+- Possible rate limiting from Spotify
+- Managing high traffic
+- Statistics for each user (e.g., how many times a user has shared a track)
+- Support for Yandex Music/Apple Music/Last.fm/etc.
+- More features like sharing playlists, searching for tracks
+- Better logging
 
 ## References
 
--   [Spotify API](https://developer.spotify.com/documentation/web-api/)
--   [Telegram Bot API](https://core.telegram.org/bots/api)
--   [aiogram](https://docs.aiogram.dev/en/latest/)
--   [tornado](https://www.tornadoweb.org/en/stable/)
--   [redis-py](https://redis-py.readthedocs.io/en/stable/)
--   [docker-compose](https://docs.docker.com/compose/)
--   [poetry](https://python-poetry.org/)
+- [Spotify API](https://developer.spotify.com/documentation/web-api/)
+- [Telegram Bot API](https://core.telegram.org/bots/api)
+- [aiogram](https://docs.aiogram.dev/en/latest/)
+- [tornado](https://www.tornadoweb.org/en/stable/)
+- [redis-py](https://redis-py.readthedocs.io/en/stable/)
+- [docker-compose](https://docs.docker.com/compose/)
+- [poetry](https://python-poetry.org/)
 
 ## License
 

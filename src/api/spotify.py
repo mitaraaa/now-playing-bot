@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Generator
 from urllib.parse import urlencode
@@ -8,7 +9,6 @@ from src.api.database import (
     delete_token,
     get_token,
     set_token,
-    subscribe_to_expire_event,
 )
 from src.api.urls import SpotifyURL
 from src.config import Config
@@ -45,8 +45,6 @@ class SpotifyClient:
 
         self.requests = httpx.AsyncClient()
 
-        subscribe_to_expire_event(self.refresh_user_credentials)
-
     async def build_user_credentials(self, grant: str) -> dict:
         """
         Get user credentials from Spotify.
@@ -72,7 +70,7 @@ class SpotifyClient:
 
         return response.json()
 
-    def get_credentials(self, user_id: str) -> dict:
+    async def get_credentials(self, user_id: str) -> dict:
         """
         Get user credentials from Redis.
         """
@@ -82,15 +80,20 @@ class SpotifyClient:
             logger.debug(f"[{user_id}]: User credentials not found")
             raise Exception("User credentials not found")
 
-        return json.loads(credentials)
+        credentials = json.loads(credentials)
 
-    def refresh_user_credentials(self, message: dict[str, str]) -> dict:
+        if credentials["expires_at"] < datetime.datetime.now().timestamp():
+            logger.debug(f"[{user_id}]: User credentials expired")
+            credentials = await self.refresh_user_credentials(
+                user_id, credentials["refresh_token"]
+            )
+
+        return credentials
+
+    async def refresh_user_credentials(self, user_id: str, refresh_token: str) -> dict:
         """
         Refresh user credentials on expire event.
         """
-
-        user_id = message["data"].split(":")[1]
-        refresh_token = self.get_credentials(user_id)["refresh_token"]
 
         delete_token(user_id)
 
@@ -99,7 +102,7 @@ class SpotifyClient:
             "refresh_token": refresh_token,
         }
 
-        response = httpx.post(
+        response = await self.requests.post(
             SpotifyURL.TOKEN,
             data=data,
             auth=(self._client_id, self._client_secret),
@@ -113,10 +116,11 @@ class SpotifyClient:
             return
 
         new = response.json()
-        new["refresh_token"] = refresh_token
 
         set_token(user_id, new)
         logger.debug(f"[{user_id}]: Token refreshed")
+
+        return new
 
     def register(self, user_id: str) -> str:
         """
@@ -138,7 +142,7 @@ class SpotifyClient:
         """
         Add a track to the user's queue.
         """
-        credentials = self.get_credentials(user_id)
+        credentials = await self.get_credentials(user_id)
 
         if not credentials:
             logger.debug(f"[{user_id}]: User credentials not found")
@@ -162,7 +166,7 @@ class SpotifyClient:
         """
         Get the currently playing track.
         """
-        credentials = self.get_credentials(user_id)
+        credentials = await self.get_credentials(user_id)
 
         response = await self.requests.get(
             SpotifyURL.CURRENTLY_PLAYING,
@@ -182,7 +186,7 @@ class SpotifyClient:
         """
         Get the user's recently played tracks.
         """
-        credentials = self.get_credentials(user_id)
+        credentials = await self.get_credentials(user_id)
 
         response = await self.requests.get(
             SpotifyURL.RECENTLY_PLAYED,

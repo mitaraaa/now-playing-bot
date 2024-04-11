@@ -15,7 +15,6 @@ class Config:
 
     SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
     SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-    TOKEN_TTL = os.getenv("TOKEN_TTL", 3600)
 
     REDIS_HOST = os.getenv("REDIS_HOST")
     REDIS_PORT = os.getenv("REDIS_PORT")

@@ -1,3 +1,4 @@
+import datetime
 import json
 
 import redis
@@ -15,19 +16,6 @@ r = redis.Redis(
     decode_responses=True,
     charset="utf-8",
 )
-r.config_set("notify-keyspace-events", "KEA")
-
-
-def subscribe_to_expire_event(callback: callable) -> None:
-    """
-    Handles expiration of access tokens.
-    """
-    pubsub = r.pubsub()
-
-    pubsub.psubscribe(**{"__keyevent@0__:expired": callback})
-    pubsub.run_in_thread(sleep_time=0.001)
-
-    logger.debug("Subscribed to '__keyevent@0__:expired' channel")
 
 
 def get_token(user_id: str) -> dict:
@@ -37,10 +25,14 @@ def get_token(user_id: str) -> dict:
 
 def set_token(user_id: str, credentials: dict) -> None:
     logger.debug(
-        f"Setting token for user {user_id}, expires in {Config.TOKEN_TTL} seconds"
+        f"Setting token for user {user_id}, expires in {credentials['expires_in']} seconds"
     )
+
+    credentials["expires_at"] = (
+        datetime.datetime.now() + datetime.timedelta(seconds=credentials["expires_in"])
+    ).timestamp()
+
     r.set(user_id, json.dumps(credentials))
-    r.set("expired:" + user_id, "", ex=Config.TOKEN_TTL)
 
 
 def delete_token(user_id: str) -> None:
