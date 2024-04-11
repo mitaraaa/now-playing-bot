@@ -66,7 +66,7 @@ This will start the bot with the mode specified in the `.env` file.
 To start the bot with Docker, run the following commands:
 
 ```sh
-docker build -t mitaraaa/now-playing-app:1 .
+docker compose build
 docker compose up
 ```
 
