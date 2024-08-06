@@ -102,6 +102,8 @@ class SpotifyClient:
             "refresh_token": refresh_token,
         }
 
+        logger.debug(f"[{user_id}]: Attempting to refresh token")
+
         response = await self.requests.post(
             SpotifyURL.TOKEN,
             data=data,
@@ -116,6 +118,7 @@ class SpotifyClient:
             return
 
         new = response.json()
+        new["refresh_token"] = refresh_token
 
         set_token(user_id, new)
         logger.debug(f"[{user_id}]: Token refreshed")
@@ -187,6 +190,10 @@ class SpotifyClient:
         Get the user's recently played tracks.
         """
         credentials = await self.get_credentials(user_id)
+
+        if not credentials:
+            logger.debug(f"[{user_id}]: User credentials not found")
+            raise Exception("User credentials not found")
 
         response = await self.requests.get(
             SpotifyURL.RECENTLY_PLAYED,
