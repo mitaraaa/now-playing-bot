@@ -165,6 +165,25 @@ class SpotifyClient:
             logger.debug(f"[{user_id}]: Failed to add track to queue ({uri})")
             raise Exception("Failed to add track to queue")
 
+    async def get_track(self, user_id: str, track_id: str) -> dict:
+        """
+        Get a track by its ID.
+        """
+        credentials = await self.get_credentials(user_id)
+
+        response = await self.requests.get(
+            SpotifyURL.GET_TRACK.format(
+                track_id=track_id,
+                headers={"Authorization": f"Bearer {credentials['access_token']}"},
+            )
+        )
+
+        if response.status_code != 200:
+            logger.debug(f"Failed to get track ({track_id})")
+            return None
+
+        return response.json()
+
     async def get_currently_playing(self, user_id: str) -> dict:
         """
         Get the currently playing track.
@@ -222,6 +241,8 @@ class SpotifyClient:
         for track in map(lambda x: x["track"], items):
             if tracks and track["uri"] in map(lambda x: x["uri"], tracks):
                 continue
+
+            track = await self.get_track(user_id, track["id"])
 
             tracks.append(
                 {
