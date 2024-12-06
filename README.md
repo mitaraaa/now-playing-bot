@@ -1,5 +1,8 @@
 # Spotify Now Playing Telegram Bot
 
+**Archived!**  
+Due to Spotify's [recent changes to their API](https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api), the bot can no longer fetch the now-deprecated `preview_url` value. Since this feature was the primary purpose of the bot, its support has been discontinued.
+
 This bot allows you to share your recently played Spotify tracks in Telegram.
 
 Try it out: [@spotifynpbot](https://t.me/spotifynpbot)
